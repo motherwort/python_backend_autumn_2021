@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>{{ username }}</title>
+        <style type="text/css">
+            body {
+                background-color: #326281; /* Цвет фона веб-страницы */
+            }
+            p.header { 
+                font-weight: 600;
+                font-size: 30;
+                color: #ffffff;
+                text-align: center;
+            }
+            p.center {
+                text-align: center;
+            }
+            p.help {
+                margin: 0 auto; 
+                font-size: 10;
+                color: #ffffff;
+                text-align: center;
+            }
+            form { 
+                margin: 0 auto; 
+                width: 350px;
+                text-align: center;
+            }
+            p.block {margin-bottom: 15px;}
+        </style>
+    </head>
+    <body>
+        <form action="/users/">
+            <button type="submit">Все пользователи</button>
+        </form>
+        </br>
+        </br>
+        <p class="header"> Изменение пользователя {{ username }}: </p>
+        <form method="post" action="edit/">
+            <p class="block">
+                <input type="email", name="email", 
+                    placeholder="Почта", value="{{ email }}", 
+                    required/>
+            </p>
+            <p class='block'>
+                <input type="text", name="name", 
+                    placeholder="Имя (не обязательно)", value="{{ name }}"/>
+                <textarea cols="21", rows="3", name="user_info", 
+                    placeholder="О себе... (не обязательно)">{{ user_info }}</textarea>
+            </p>
+            <p class='block'>
+                <input type="password", name="new_password", 
+                    placeholder="Новый пароль (не обязательно)"/>
+                <p class="help">Введите пароль, чтобы сохранить изменения:</p>
+                <input type="password", name="old_password", 
+                    placeholder="Старый пароль", required/>
+                <button type="submit">Изменить</button>
+            </p>
+        </form>
+
+        <form method="post" action="delete/">
+            <p class="help">Введите пароль, чтобы подтвердить удаление:</p>
+            <input type="password", name="password", 
+                placeholder="Пароль", required/>
+            <button type="submit">Удалить</button>
+        </form>
+    </body>
+</html>

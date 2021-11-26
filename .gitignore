@@ -1,0 +1,10 @@
+.spyproject
+__pycache__
+virtualenv
+app_venv
+local_settings.py
+local_scripts.py
+*.pyc
+*.ini
+*.bak
+*.sqlite3

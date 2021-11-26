@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Регистрация</title>
+        <style type="text/css">
+            body {
+                background-color: #c91717; /* Цвет фона веб-страницы */
+            } 
+            p.header { 
+                font-weight: 600;
+                font-size: 30;
+                color: #ffffff;
+                text-align: center;
+            }
+            form { 
+                margin: 0 auto; 
+                width:250px;
+                text-align: center;
+            }
+            p.block {margin-bottom: 15px;}
+        </style>
+    </head>
+    <body>
+        </br>
+        </br>
+        <p class='header'> Регистрация нового пользователя: </p>
+        <form method="post" action="/users/new/">
+            <p class='block'>
+                <input type="text", name="username", placeholder="Никнейм", required/>
+                <input type="email", name="email", placeholder="Почта", required/>
+                <input type="password", name="password", placeholder="Пароль", required/>
+            </p>
+            <p class='block'>
+                <input type="text", name="name", placeholder="Имя (не обязательно)"/>
+                <textarea cols="21", rows="3", name="user_info", placeholder="О себе... (не обязательно)"></textarea>
+            </p>
+            <button type="submit">Зарегистрироваться</button>
+        </form>        
+    </body>
+</html>

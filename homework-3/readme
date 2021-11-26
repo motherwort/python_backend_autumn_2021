@@ -1,0 +1,3 @@
+ Move project-3 file to /etc/nginx/sites-available/
+ 
+ Then create symbolic link of /etc/nginx/sites-available/project-3 to /etc/nginx/sites-enabled/project-3
