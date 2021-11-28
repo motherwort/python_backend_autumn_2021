@@ -3,8 +3,8 @@ from threads.models import Thread
 
 
 class ThreadAdmin(admin.ModelAdmin):
-    list_filter = ('pool',)
-    list_display = ('title', 'description', 'pool')
+    list_filter = ('pool', 'creator',)
+    list_display = ('title', 'pool', 'description', 'creator')
 
 
 admin.site.register(Thread, ThreadAdmin)

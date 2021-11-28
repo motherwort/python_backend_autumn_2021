@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 from pools.views import create_pool, list_pools, pool_detail
 
 

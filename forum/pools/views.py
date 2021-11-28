@@ -1,54 +1,67 @@
-from django.http.response import Http404, HttpResponseBadRequest, JsonResponse, HttpResponse
-from django.shortcuts import redirect, render
-from django.template import loader
-from application.common import check_method
+from django.http.response import Http404, JsonResponse
+from django.views.decorators.http import require_GET, require_POST
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from pools.serializers import PoolSerializer
 from pools.models import Pool
-from users.models import User
 
 
-def __pool_to_dict(pool):
-    dct = {
-        'id': pool.id,
-        'name': pool.name,
-        'description': pool.description,
-        'creation time': pool.created
-    }
-    return dct
+class PoolViewSet(viewsets.ViewSet):
+    def list(self, request):
+        queryset = Pool.objects.all()
+        serializer = PoolSerializer(queryset, many=True)
+        return Response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        queryset = Pool.objects.all()
+        pool = get_object_or_404(queryset, pk=pk)
+        serializer = PoolSerializer(pool)
+        return Response(serializer.data)
 
-@check_method('POST')
-def create_pool(request):
-    pool = Pool(
-        name=request.POST['name'],
-        description=request.POST['description']
-    )
-    pool.save()
-    return JsonResponse(__pool_to_dict(pool))
+    # TODO указать авторизованного пользователя как создателя
+    def create(self, request):
+        # request.data['creator'] = creator
+        serializer = PoolSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        msg = {
+            'msg': 'Pool created',
+            'pool_data': serializer.data
+        }
+        return Response(msg)
 
+    # TODO проверка на создателя
+    # и/или не изменение, но создание объекта poll за изменение
+    def update(self, request, pk=None):
+        queryset = Pool.objects.all()
+        pool = get_object_or_404(queryset, pk=pk)
 
-@check_method('GET')
-def list_pools(request):
-    pool_list = Pool.objects.all()
-    data = [
-        __pool_to_dict(pool) for pool in pool_list
-    ]
-    return JsonResponse({'pools': data})
+        serializer = PoolSerializer(pool, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
+        msg = {
+            'msg': 'Pool updated',
+            'pool_data': serializer.data
+        }
+        return Response(msg)
 
-@check_method('GET')
-def pool_detail(request, pool_id):
-    try:
-        pool = Pool.objects.get(id=pool_id)
-    except Pool.DoesNotExist:
-        raise Http404
-    return JsonResponse(__pool_to_dict(pool))
+    # TODO добавить авторизованного пользователя в список участников
+    @action(detail=True, methods=['post'])
+    def join(self, request, pk=None):
+        raise NotImplementedError
 
-
-@check_method('POST')
-def edit_pool(request):
-    raise NotImplementedError
-
-
-@check_method('POST')
-def join_pool(request):
-    raise NotImplementedError
+    # TODO проверка на создателя
+    # и/или создание голосования за удаление
+    def destroy(self, request, pk=None):
+        queryset = Pool.objects.all()
+        pool = get_object_or_404(queryset, pk=pk)
+        serializer = PoolSerializer(pool)
+        pool.delete()
+        msg = {
+            'msg': 'Pool deleted',
+            'pool_data': serializer.data
+        }
+        return Response(msg)

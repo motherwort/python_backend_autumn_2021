@@ -20,8 +20,9 @@ from application.views import index, registration
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
-    path('registration/', registration, name='registration'),
+    path('api/', include('application.api_urls')),
     path('users/', include('users.urls')),
-    path('pools/', include('pools.urls'))
+    # path('pools/', include('pools.urls')),
+    path('registration/', registration, name='registration'),
+    path('', index, name='index'),
 ]
