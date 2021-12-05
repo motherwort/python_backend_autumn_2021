@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from application.common import require_authentication
 from posts.serializers import PostSerializer
 from posts.models import Post
 from threads.models import Thread
@@ -20,29 +22,24 @@ class PostViewSet(viewsets.ViewSet):
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
-    # TODO создавать от имени авторизованного пользователя
+    @require_authentication
     def create(self, request):
-        thread_id = request.data['thread']
-        get_object_or_404(Thread.objects.all(), pk=thread_id)
-
-        user_id = request.data['user']
-        get_object_or_404(User.objects.all(), pk=user_id)
-        # request.data['creator'] = creator ### вместо того, что выше
-
-        serializer = PostSerializer(data=request.data)
+        serializer = PostSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
         msg = {
             'msg': 'Post created',
             'post_data': serializer.data
         }
         return Response(msg)
 
+    @require_authentication
     def update(self, request, pk=None):
-        # TODO проверка на создателя
         queryset = Post.objects.all()
         post = get_object_or_404(queryset, pk=pk)
+
+        if request.user != post.user:
+            raise PermissionDenied
 
         serializer = PostSerializer(post, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -54,20 +51,25 @@ class PostViewSet(viewsets.ViewSet):
         }
         return Response(msg)
 
+    # TODO upvotes
+    @require_authentication
     @action(detail=True, methods=['post'])
     def upvote(self, request, pk=None):
-        # TODO добавить авторизованного пользователя в список участников
         raise NotImplementedError
-
+    
+    @require_authentication
     def destroy(self, request, pk=None):
-        # TODO проверка на создателя
         queryset = Post.objects.all()
         post = get_object_or_404(queryset, pk=pk)
+
+        if request.user != post.user:
+            raise PermissionDenied
+            
         serializer = PostSerializer(post)
-        post.is_deleted = True
-        post.save()
         msg = {
             'msg': 'Post deleted',
             'post_data': serializer.data
         }
+        post.is_deleted = True
+        post.save()
         return Response(msg)

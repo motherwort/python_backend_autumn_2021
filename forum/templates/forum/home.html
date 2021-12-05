@@ -1,0 +1,21 @@
+{% extends 'forum/base.html' %}
+{% block title %} Home {% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-12 mb-3">
+        <h4 class="text-center"> Welcome {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %} </h4>
+        
+        <div class="col-md-8 mx-auto social-container my-2 order-md-1">
+            {% if user.is_authenticated %}
+            <button class="btn btn-primary mb-2">
+                <a href="/logout">Logout</a>
+            </button>
+            {% else %}
+            <button class="btn btn-primary mb-2">
+                <a href="/login">Login</a>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -22,6 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
 
         return self.instance
 
+    # TODO убрать необходимость ввода пароля при любых изменениях,
+    # требовать только при изменении пароля
     def is_valid(self, raise_exception=False):
         super().is_valid(raise_exception=False)
 
@@ -41,6 +43,8 @@ class UserSerializer(serializers.ModelSerializer):
         # Validating new_password
         if 'new_password' in self.initial_data:
             try:
+                # TODO
+                # from django.contrib.auth.password_validation import validate_password ???
                 new_pwd = self.validate_password(self.initial_data['new_password'])
             except ValidationError as exc:
                 self._errors['new_password'] = exc.detail
@@ -52,7 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return not bool(self._errors)
     
-    # TODO формат пароля установить
+    # TODO убрать, вернуть проверки из AUTH_PASSWORD_VALIDATORS (???)
     def validate_password(self, value):
         if value is None:
             raise serializers.ValidationError("Password required")

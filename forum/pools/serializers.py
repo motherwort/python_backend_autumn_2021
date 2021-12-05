@@ -1,43 +1,27 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from application import common
 from pools.models import Pool
+from users.models import User
 
 
-class PoolSerializer(serializers.ModelSerializer):
-    constant_fields = ['users', 'creator']
-    creator = serializers.SerializerMethodField()
-    users = serializers.SerializerMethodField()
+class UserListingField(serializers.RelatedField):
+    def to_representation(self, user):
+        user_repr = {
+            'id': user.id,
+            'username': str(user),
+        }
+        return user_repr
 
-    def get_creator(self, obj):
-        return getattr(obj.creator, 'username', None)
 
-    def get_users(self, obj):
-        users = obj.users.all()
-        users_str = [
-            {
-                'id': user.id,
-                'username': str(user),
-            }
-            for user in users
-        ]
-        return users_str
+class PoolSerializer(common.ModelSerializer):
+    users = UserListingField(read_only=True, many=True)
+    creator = common.ModelPKField(
+        User, ['id', 'username'], 
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         model = Pool
         fields = ['id', 'name', 'description', 'users', 'creator', 'created']
-        read_only_fields = ['created', 'users']
-        
-    def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
-
-        # Don't allow modification of fields in self.constant_fields
-        if self.instance is not None:
-            for field in self.constant_fields:
-                if field in self.initial_data:
-                    exc = ValidationError("Can't modify this field")
-                    self._errors[field] = exc.detail
-
-        if self._errors and raise_exception:
-            raise ValidationError(self.errors)
-
-        return not bool(self._errors)
+        read_only_fields = ['id', 'users', 'created']
+        default_only_fields = ['creator']

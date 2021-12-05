@@ -8,3 +8,5 @@ local_scripts.py
 *.ini
 *.bak
 *.sqlite3
+*.pgsql
+___*

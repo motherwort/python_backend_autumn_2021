@@ -8,6 +8,7 @@ class CustomUnicodeUsernameValidator(UnicodeUsernameValidator):
     regex = r'^[\w.]+\Z'
 
 
+# TODO remove name
 class User(AbstractUser):
     username = models.CharField(
         _("username"),

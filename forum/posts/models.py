@@ -4,6 +4,7 @@ from users.models import User
 from django.utils import timezone
 
 
+# TODO upvotes, unedited_content, rename user->creator
 class Post(models.Model):
     created = models.DateTimeField(default=timezone.now, verbose_name='Post creation time')
     is_edited = models.BooleanField(default=False, verbose_name='Is edited')

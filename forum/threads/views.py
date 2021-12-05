@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from application.common import require_authentication
 from threads.serializers import ThreadSerializer
 from threads.models import Thread
-from pools.models import Pool
 
 
 class ThreadViewSet(viewsets.ViewSet):
@@ -18,13 +19,9 @@ class ThreadViewSet(viewsets.ViewSet):
         serializer = ThreadSerializer(pool)
         return Response(serializer.data)
 
-    # TODO создавать от имени авторизованного пользователя
+    @require_authentication
     def create(self, request):
-        pool_id = request.data.get('pool', None)
-        get_object_or_404(Pool.objects.all(), pk=pool_id)
-
-        # request.data['creator'] = creator
-        serializer = ThreadSerializer(data=request.data)
+        serializer = ThreadSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -34,11 +31,14 @@ class ThreadViewSet(viewsets.ViewSet):
         }
         return Response(msg)
 
-    # TODO проверка на создателя
-    # и/или не изменение, но создание объекта poll за изменение
+    # TODO не изменение, но создание объекта poll за изменение
+    @require_authentication
     def update(self, request, pk=None):
         queryset = Thread.objects.all()
         thread = get_object_or_404(queryset, pk=pk)
+
+        if request.user != thread.creator:
+            raise PermissionDenied
 
         serializer = ThreadSerializer(thread, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -51,15 +51,19 @@ class ThreadViewSet(viewsets.ViewSet):
         }
         return Response(msg)
 
-    # TODO проверка на создателя
-    # и/или создание голосования за удаление
+    # TODO создание голосования за удаление
+    @require_authentication
     def destroy(self, request, pk=None):
         queryset = Thread.objects.all()
         thread = get_object_or_404(queryset, pk=pk)
+
+        if request.user != thread.creator:
+            raise PermissionDenied
+
         serializer = ThreadSerializer(thread)
-        thread.delete()
         msg = {
             'msg': 'Thread deleted',
             'thread_data': serializer.data
         }
+        thread.delete()
         return Response(msg)
