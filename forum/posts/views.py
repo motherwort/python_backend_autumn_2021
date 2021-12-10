@@ -6,8 +6,7 @@ from rest_framework.response import Response
 from application.common import require_authentication
 from posts.serializers import PostSerializer
 from posts.models import Post
-from threads.models import Thread
-from users.models import User
+from posts.tasks import _send_dict_mail, send_dict_mail
 
 
 class PostViewSet(viewsets.ViewSet):
@@ -26,11 +25,16 @@ class PostViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = PostSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        post = serializer.save()
         msg = {
             'msg': 'Post created',
             'post_data': serializer.data
         }
+        send_dict_mail(
+            subject=msg['msg'], 
+            dict=msg['post_data'],
+            from_email=post.user.email
+        )
         return Response(msg)
 
     @require_authentication
@@ -43,12 +47,17 @@ class PostViewSet(viewsets.ViewSet):
 
         serializer = PostSerializer(post, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        post = serializer.save()
 
         msg = {
             'msg': 'Post updated',
             'post_data': serializer.data
         }
+        send_dict_mail(
+            subject=msg['msg'], 
+            dict=msg['post_data'],
+            from_email=post.user.email
+        )
         return Response(msg)
 
     # TODO upvotes

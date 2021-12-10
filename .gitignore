@@ -13,3 +13,4 @@ local_scripts.py
 ___*
 *.code-workspace
 .vscode
+dump.rdb
