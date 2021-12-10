@@ -1,11 +1,10 @@
-import os
 import sys
 import aiohttp
 import asyncio
-import random
 from django.core.validators import URLValidator
+from requests.sessions import session
 import common
-import time
+import random
 from client import get_urls
 
 
@@ -21,14 +20,12 @@ async def fetch_url(url, k, session, lock):
     if not URLValidator(url):
         return
     async with lock:
-        async with session.get(url) as resp:
+        async with session.request('get', url) as resp:
             resp = await session.get(url)
             text = await resp.text()
         data = common.get_k_frequent_words(text, k)
         with open('a_out.txt', 'a') as f:
             f.write(f'{url} : {data}\n')
-
-
 
 
 async def main():

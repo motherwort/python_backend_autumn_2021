@@ -11,6 +11,7 @@ def get_random_wikipedia_urls(n, output_file='urls.txt'):
         for i in range(n):
             url = requests.get(URL).url
             url = unquote(url)
+            print(url)
             file.write(url+'\n')
     
 
@@ -59,9 +60,4 @@ def get_k_frequent_words(resp_text, k):
 
 
 if __name__ == '__main__':
-    with open('out.txt') as f:
-        text = f.read()
-        text = re.sub(r' : {[^}]*}\n', '\n', text)
-    with open('urls.txt', 'w') as f:
-        f.write(text)
-    pass
+    get_random_wikipedia_urls(100, 'new_urls.txt')
