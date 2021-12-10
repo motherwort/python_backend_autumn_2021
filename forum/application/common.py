@@ -15,6 +15,9 @@ def require_authentication(view):
 
 
 class ModelSerializer(serializers.ModelSerializer):
+    """
+    Extends validation of serializers.ModelSerializer. 
+    """
     def is_valid(self, raise_exception=False):
         read_only_fields = getattr(self.Meta, 'read_only_fields', [])
         default_only_fields = getattr(self.Meta, 'default_only_fields', [])

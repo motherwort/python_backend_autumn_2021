@@ -9,4 +9,7 @@ local_scripts.py
 *.bak
 *.sqlite3
 *.pgsql
+*.sh
 ___*
+*.code-workspace
+.vscode

@@ -1,6 +1,9 @@
 import sys
 import threading
+import json
+from django.core.validators import URLValidator
 import requests
+import common
 import socket
 import selectors
 
@@ -40,20 +43,16 @@ class Worker:
         if hasattr(self, 'processed_data'):
             if self.processed_data:
                 self.client_sock.send(self.processed_data)
-                self.selector.unregister(self.client_sock)
                 if self.post_action:
-                    self.selector.register(self.client_sock, selectors.EVENT_READ, self.post_action)  
-                else:
-                    self.client_sock.close()
-            else:
-                self.selector.unregister(self.client_sock)
-                self.client_sock.close()
+                    self.post_action()
+            self.selector.unregister(self.client_sock)
+            self.client_sock.close()
             
     def _process(self, *args, **kwargs):
         if self.lock:
             with self.lock:
                 self.processed_data = self.process(*args, **kwargs)
-                self.selector.unregister(self.client_sock)
+                self.key = self.selector.unregister(self.client_sock)
                 self.selector.register(
                     self.client_sock, 
                     selectors.EVENT_WRITE, 
@@ -68,11 +67,15 @@ def get_url_fetcher(k):
     class UrlFetcher(Worker):
         k_frequent_words = k
 
-        # TODO Воркер обкачивает url по https
-        # и возвращает клиенту топ K самых частых слов 
-        # и их количества в формате json
-        def process(self, data):
-            return data.decode().upper().encode()
+        def process(self, url):
+            if not URLValidator(url):
+                return None
+            resp = requests.get(url)
+            most_frequent = common.get_k_frequent_words(
+                resp.text, 
+                self.k_frequent_words
+            )
+            return json.dumps(most_frequent).encode()
             
     return UrlFetcher
 
@@ -112,10 +115,10 @@ class Server:
         )
         worker.fit(data)
 
-    def post_action(self, client_sock):
+    def post_action(self):
         self.completed_requests += 1
-        print(f'{self.completed_requests} requests completed')
-        return self.read(self, client_sock)
+        print(f'{self.completed_requests} requests completed', end='\r')
+
 
 if __name__ == '__main__':
     w, k = read_sys_args()
