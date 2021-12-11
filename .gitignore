@@ -13,4 +13,6 @@ local_scripts.py
 ___*
 *.code-workspace
 .vscode
+forum/logs/*
 dump.rdb
+forum/celerybeat-schedule

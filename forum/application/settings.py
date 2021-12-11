@@ -153,7 +153,6 @@ SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
 SOCIAL_AUTH_VK_KEY = ''
 SOCIAL_AUTH_VK_SECRET = ''
 
-# EMAIL_HOST = 'smtp.rambler.ru'
 EMAIL_HOST = 'smtp.googlemail.com'
 EMAIL_PORT =  465
 EMAIL_USE_TSL = False
@@ -161,29 +160,23 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'user'
 EMAIL_HOST_PASSWORD = 'password'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_EMAIL = 'user@host'
 
 ADMINS = ['admin@email.com']
 
-# celery conf
 CELERY_TIMEZONE = "Europe/Moscow"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'django-db'
 
-# CELERY_BEAT_SCHEDULE = {
-#     'tracker_checking': {
-#         'task': 'tracker.tasks.some_sleep',
-#         'args': (5,),
-#         'schedule': 15,
-#     },
-#     'dayly-check': {
-#         'task': 'tracker.tasks.increment',
-#         'args': (20,),
-#         'schedule': 25,
-#         # 'options': {'queue': 'queue2'}
-#     },
-# }
+CELERY_BEAT_SCHEDULE = {
+    'get_all_posts_in_pools': {
+        'task': 'pools.tasks.count_pools_posts',
+        'schedule': 30.0,
+        'args': (),
+    },
+}
 
 try:
     from .local_settings import *

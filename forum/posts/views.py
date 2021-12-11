@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from application.common import require_authentication
 from posts.serializers import PostSerializer
 from posts.models import Post
-from posts.tasks import _send_dict_mail, send_dict_mail
+from posts.tasks import send_dict_mail
 
 
 class PostViewSet(viewsets.ViewSet):
@@ -30,10 +30,9 @@ class PostViewSet(viewsets.ViewSet):
             'msg': 'Post created',
             'post_data': serializer.data
         }
-        send_dict_mail(
+        send_dict_mail.delay(
             subject=msg['msg'], 
-            dict=msg['post_data'],
-            from_email=post.user.email
+            dict=msg['post_data']
         )
         return Response(msg)
 
@@ -55,8 +54,7 @@ class PostViewSet(viewsets.ViewSet):
         }
         send_dict_mail(
             subject=msg['msg'], 
-            dict=msg['post_data'],
-            from_email=post.user.email
+            dict=msg['post_data']
         )
         return Response(msg)
 
