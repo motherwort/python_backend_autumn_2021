@@ -19,8 +19,12 @@ defusedxml==0.7.1
 Deprecated==1.2.13
 Django==3.2.9
 django-celery-results==2.2.0
+django-elasticsearch-dsl==7.2.1
+django-extensions==3.1.5
 django-smtp-ssl==1.0
 djangorestframework==3.12.4
+elasticsearch==7.16.0
+elasticsearch-dsl==7.4.0
 flake8==4.0.1
 flower==1.0.0
 frozenlist==1.2.0
@@ -30,7 +34,6 @@ idna==3.3
 kombu==5.2.2
 mccabe==0.6.1
 multidict==5.2.0
-numpy==1.21.4
 oauthlib==3.1.1
 prometheus-client==0.12.0
 prompt-toolkit==3.0.24
@@ -39,6 +42,8 @@ pycodestyle==2.8.0
 pycparser==2.21
 pyflakes==2.4.0
 PyJWT==2.3.0
+pyOpenSSL==21.0.0
+python-dateutil==2.8.2
 python3-openid==3.2.0
 pytz==2021.3
 redis==4.0.2
@@ -54,5 +59,6 @@ typing-extensions==4.0.1
 urllib3==1.26.7
 vine==5.0.0
 wcwidth==0.2.5
+Werkzeug==2.0.2
 wrapt==1.13.3
 yarl==1.7.2

@@ -1,7 +1,27 @@
+from importlib import import_module
 from django.shortcuts import redirect
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from users.models import User
+
+
+def get_serializer(app_name):
+    return getattr(
+        import_module(
+            f'{app_name}.serializers',
+            package='application'
+        ),
+        f'{app_name.title()[:-1]}Serializer'
+    )
+
+
+def get_document(app_name):
+    return getattr(
+        import_module(
+            f'{app_name}.documents',
+            package='application'
+        ),
+        f'{app_name.title()[:-1]}Document'
+    )
 
 
 def require_authentication(view):
