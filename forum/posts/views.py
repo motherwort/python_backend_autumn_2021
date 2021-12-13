@@ -52,7 +52,7 @@ class PostViewSet(viewsets.ViewSet):
             'msg': 'Post updated',
             'post_data': serializer.data
         }
-        send_dict_mail(
+        send_dict_mail.delay(
             subject=msg['msg'], 
             dict=msg['post_data']
         )
